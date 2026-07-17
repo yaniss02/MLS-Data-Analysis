@@ -1,0 +1,19 @@
+# Project specific ignores
+project_ideas.md
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Python cache and byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Temporary / scratch outputs
+test_viz.png
