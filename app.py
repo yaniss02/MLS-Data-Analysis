@@ -7,11 +7,117 @@ import plotly.graph_objects as go
 
 # Set page config
 st.set_page_config(
-    page_title="FM24 DATA HUB // MLS ANALYTICS",
+    page_title="MLS Stats",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# --- CORRECTED ESPCN SOCCER TEAM LOGO AND FLAGCDN COUNTRY CODE MAPS ---
+espn_logo_map = {
+    "ATL": "18418",  # Atlanta United FC
+    "CHI": "182",    # Chicago Fire FC
+    "COL": "184",    # Colorado Rapids
+    "CLB": "183",    # Columbus Crew
+    "DC": "193",     # D.C. United
+    "DAL": "185",    # FC Dallas
+    "HOU": "6077",   # Houston Dynamo FC
+    "LA": "187",     # LA Galaxy
+    "LAX": "187",    # LA Galaxy (alt)
+    "LAFC": "18966", # Los Angeles FC
+    "MIN": "17362",  # Minnesota United FC
+    "MTL": "9720",   # CF Montréal (Montreal Impact)
+    "NE": "189",     # New England Revolution
+    "NY": "190",     # New York Red Bulls
+    "NYRB": "190",   # New York Red Bulls (alt)
+    "RBNY": "190",   # New York Red Bulls (alt2)
+    "NYC": "17606",  # New York City FC
+    "ORL": "12011",  # Orlando City SC
+    "PHI": "10739",  # Philadelphia Union
+    "POR": "9723",   # Portland Timbers
+    "RSL": "4771",   # Real Salt Lake
+    "SJ": "191",     # San Jose Earthquakes
+    "SEA": "9726",   # Seattle Sounders FC
+    "SKC": "186",    # Sporting Kansas City
+    "TOR": "7318",   # Toronto FC
+    "VAN": "9727",   # Vancouver Whitecaps
+    "CIN": "18267",  # FC Cincinnati
+    "NSH": "18986",  # Nashville SC
+    "MIA": "20232",  # Inter Miami CF
+    "CLT": "21300",  # Charlotte FC
+    "STL": "21812",  # St. Louis CITY SC
+    "ATX": "20906",  # Austin FC
+    "SD": "22529",   # San Diego FC
+}
+
+flag_country_map = {
+    "USA": "us",
+    "United States": "us",
+    "Argentina": "ar",
+    "Brazil": "br",
+    "France": "fr",
+    "Colombia": "co",
+    "Senegal": "sn",
+    "Uruguay": "uy",
+    "Canada": "ca",
+    "Mexico": "mx",
+    "Spain": "es",
+    "England": "gb",
+    "Germany": "de",
+    "Italy": "it",
+    "Belgium": "be",
+    "Netherlands": "nl",
+    "Portugal": "pt",
+    "Croatia": "hr",
+    "Paraguay": "py",
+    "Ecuador": "ec",
+    "Peru": "pe",
+    "Venezuela": "ve",
+    "Chile": "cl",
+    "Ghana": "gh",
+    "Nigeria": "ng",
+    "Cameroon": "cm",
+    "Egypt": "eg",
+    "Morocco": "ma",
+    "Japan": "jp",
+    "South Korea": "kr",
+    "Australia": "au",
+    "New Zealand": "nz",
+    "Sweden": "se",
+    "Norway": "no",
+    "Denmark": "dk",
+    "Switzerland": "ch",
+    "Austria": "at",
+    "Poland": "pl",
+    "Ukraine": "ua",
+    "Costa Rica": "cr",
+    "Panama": "pa",
+    "Honduras": "hn",
+    "Jamaica": "jm",
+    "El Salvador": "sv",
+    "Finland": "fi",
+    "Iceland": "is",
+    "Ireland": "ie",
+    "Scotland": "gb-sct",
+    "Wales": "gb-wls",
+    "Greece": "gr",
+    "Turkey": "tr",
+    "Ivory Coast": "ci",
+    "South Africa": "za",
+    "Haiti": "ht",
+    "Guatemala": "gt",
+    "Slovakia": "sk",
+    "Slovenia": "si",
+    "Czech Republic": "cz",
+    "Bulgaria": "bg",
+    "Hungary": "hu",
+    "Romania": "ro",
+    "Serbia": "rs",
+    "Bosnia and Herzegovina": "ba",
+    "Armenia": "am",
+    "Cape Verde": "cv",
+    "Guinea": "gn"
+}
 
 # --- CUSTOM CSS STYLING (FM24 DARK THEME WITH RAJDHANI FONT) ---
 st.markdown("""
@@ -161,11 +267,26 @@ st.markdown("""
         color: #ffffff !important;
     }
     
-    /* Selectbox and Multiselect dark styling */
+    /* Selectbox and Multiselect dark styling (Styled to look like a premium full-width search input) */
     div[data-baseweb="select"] > div {
         background-color: #1a1528 !important;
-        border-color: rgba(16, 185, 129, 0.4) !important;
+        border-color: rgba(16, 185, 129, 0.5) !important;
         color: #ffffff !important;
+        border-radius: 6px !important;
+        font-family: 'Rajdhani', sans-serif !important;
+        font-size: 1.25rem !important;
+        height: 50px !important;
+    }
+    
+    div[data-baseweb="select"] input {
+        color: #ffffff !important;
+        font-family: 'Rajdhani', sans-serif !important;
+    }
+    
+    /* Custom checkbox and interactive elements styling */
+    div[data-testid="stCheckbox"] label span {
+        color: #ffffff !important;
+        font-family: 'Rajdhani', sans-serif !important;
     }
     
     /* Custom button styling */
@@ -179,6 +300,28 @@ st.markdown("""
     .stButton > button:hover {
         background-color: #10b981 !important;
         color: #ffffff !important;
+    }
+
+    /* --- CENTER AND ENLARGE LOADING SPINNER --- */
+    div[data-testid="stSpinner"] {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 999999 !important;
+        background-color: rgba(18, 14, 30, 0.8) !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    div[data-testid="stSpinner"] > div {
+        width: 90px !important;
+        height: 90px !important;
+        border-width: 6px !important;
+        border-color: #10b981 transparent #10b981 transparent !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -197,50 +340,63 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Initialize ASA client
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def get_asa_client():
     return AmericanSoccerAnalysis()
 
 asa = get_asa_client()
 
-# --- Caching Data Fetching Functions ---
-@st.cache_data
+# --- Caching Data Fetching Functions (Hiding all function-specific spinners) ---
+@st.cache_data(show_spinner=False)
 def get_players():
     return asa.get_players(leagues="mls")
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_player_salaries(season):
     return asa.get_player_salaries(leagues="mls", season_name=int(season))
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_outfield_gplus(season):
     return asa.get_player_goals_added(leagues="mls", season_name=int(season))
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_gk_gplus(season):
     return asa.get_goalkeeper_goals_added(leagues="mls", season_name=int(season))
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_xgoals_season(season):
     return asa.get_player_xgoals(leagues="mls", season_name=int(season))
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_gk_xgoals_season(season):
     return asa.get_goalkeeper_xgoals(leagues="mls", season_name=int(season))
 
-@st.cache_data
-def get_player_game_goals(season):
-    outfield_games = asa.get_player_xgoals(leagues="mls", season_name=int(season), split_by_games=True)
-    gk_games = asa.get_goalkeeper_xgoals(leagues="mls", season_name=int(season), split_by_games=True)
+@st.cache_data(show_spinner=False)
+def get_teams():
+    return asa.get_teams(leagues="mls")
+
+@st.cache_data(show_spinner=False)
+def get_player_game_goals(season, player_ids=None):
+    # Query with player_ids filter if specified, avoiding 10,000 row truncation limit
+    outfield_games = asa.get_player_xgoals(leagues="mls", season_name=int(season), player_ids=player_ids, split_by_games=True)
+    gk_games = asa.get_goalkeeper_xgoals(leagues="mls", season_name=int(season), player_ids=player_ids, split_by_games=True)
     
-    df_pg = pd.concat([
-        outfield_games[['player_id', 'game_id', 'team_id', 'minutes_played']],
-        gk_games[['player_id', 'game_id', 'team_id', 'minutes_played']]
-    ], ignore_index=True)
-    
+    df_list = []
+    if len(outfield_games) > 0:
+        df_list.append(outfield_games[['player_id', 'game_id', 'team_id', 'minutes_played']])
+    if len(gk_games) > 0:
+        df_list.append(gk_games[['player_id', 'game_id', 'team_id', 'minutes_played']])
+        
+    if not df_list:
+        return pd.DataFrame(columns=['player_id', 'total_minutes', 'games_played', 'goals_for', 'goals_against', 'goal_difference'])
+        
+    df_pg = pd.concat(df_list, ignore_index=True)
     df_pg = df_pg[df_pg['minutes_played'] > 0].copy()
-    games_df = asa.get_games(leagues="mls", season_name=int(season))
     
+    if df_pg.empty:
+        return pd.DataFrame(columns=['player_id', 'total_minutes', 'games_played', 'goals_for', 'goals_against', 'goal_difference'])
+        
+    games_df = asa.get_games(leagues="mls", season_name=int(season))
     pg_merged = df_pg.merge(games_df[['game_id', 'home_team_id', 'away_team_id', 'home_score', 'away_score']], on='game_id', how='inner')
     
     pg_merged['goals_for'] = pg_merged.apply(lambda r: r['home_score'] if r['team_id'] == r['home_team_id'] else (r['away_score'] if r['team_id'] == r['away_team_id'] else 0), axis=1)
@@ -256,7 +412,7 @@ def get_player_game_goals(season):
     player_stats['goal_difference'] = player_stats['goals_for'] - player_stats['goals_against']
     return player_stats
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_winger_passing_creation(season):
     xp_def = asa.get_player_xpass(leagues="mls", season_name=int(season), pass_origin_third="Defensive")
     xp_mid = asa.get_player_xpass(leagues="mls", season_name=int(season), pass_origin_third="Middle")
@@ -281,6 +437,34 @@ def get_winger_passing_creation(season):
     
     merged['est_att_key_passes'] = (merged['key_passes'] * merged['att_third_share']).round(1)
     merged['est_att_assists'] = (merged['primary_assists'] * merged['att_third_share']).round(1)
+    
+    return merged
+
+@st.cache_data(show_spinner=False)
+def get_player_profile_database():
+    players_df = get_players()
+    salaries_2026 = get_player_salaries(2026)
+    salaries_2025 = get_player_salaries(2025)
+    teams_df = get_teams()
+    
+    clean_players = players_df.drop_duplicates(subset=["player_id"]).copy()
+    
+    # Combine salaries, prioritizing 2026, falling back to 2025
+    clean_sal_2026 = salaries_2026.sort_values("mlspa_release").groupby("player_id").last().reset_index()
+    clean_sal_2025 = salaries_2025.sort_values("mlspa_release").groupby("player_id").last().reset_index()
+    
+    # Merge and combine
+    merged_sal = clean_sal_2026.set_index("player_id").combine_first(clean_sal_2025.set_index("player_id")).reset_index()
+    
+    merged = clean_players.merge(merged_sal[["player_id", "team_id", "base_salary", "guaranteed_compensation", "position"]], on="player_id", how="left")
+    merged = merged.merge(teams_df[["team_id", "team_name", "team_abbreviation"]], on="team_id", how="left")
+    
+    # Calculate age as of 2026
+    merged['birth_date_parsed'] = pd.to_datetime(merged['birth_date'], errors='coerce')
+    merged['age_2026'] = (2026 - merged['birth_date_parsed'].dt.year).astype('Int64')
+    
+    merged['guaranteed_compensation'] = merged['guaranteed_compensation'].fillna(0)
+    merged['base_salary'] = merged['base_salary'].fillna(0)
     
     return merged
 
@@ -367,26 +551,42 @@ def draw_fm24_pitch_plotly(squad_df, formation_name="4-3-3"):
     )
     return fig
 
-# --- Navigation (Scouting & Rookie Hub set as FIRST DEFAULT PAGE!) ---
+# --- Navigation ---
 st.sidebar.markdown("<h2 style='color:#10b981;'>TACTICAL VIEWS</h2>", unsafe_allow_html=True)
-app_mode = st.sidebar.radio("Select View:", ["Scouting & Rookie Hub", "Moneyball Roster Planner"], index=0)
+app_mode = st.sidebar.radio("Select View:", ["Scouting & Rookie Hub", "Moneyball Roster Planner", "Player Profile Search"], index=0)
 
-# --- Dashboard 1: Scouting & Rookie Hub (DEFAULT FIRST PAGE) ---
+# --- Dashboard 1: Scouting & Rookie Hub ---
 if app_mode == "Scouting & Rookie Hub":
-    st.markdown("## SCOUTING HUB // RECENT SIGNINGS")
-    st.markdown("Comprehensive evaluation of under-23 rookies debuting in 2024–2025 across **Playtime**, **On-Pitch Goal Impact**, and **Attacking Winger Creation**.")
-    
     st.sidebar.markdown("---")
     st.sidebar.markdown("<h3 style='color:#10b981;'>SCOUTING FILTERS</h3>", unsafe_allow_html=True)
-    debut_years = st.sidebar.multiselect("Debut Seasons:", [2024, 2025], default=[2024, 2025])
+    
+    # 🌟 Pre-select ONLY 2026 by default as requested
+    debut_years = st.sidebar.multiselect("Debut Seasons:", [2023, 2024, 2025, 2026], default=[2026])
+    
     age_limit = st.sidebar.slider("Max Age at Debut:", 16, 23, 23)
     top_n = st.sidebar.slider("Top Players to Display:", 10, 50, 20)
-    target_playtime_season = 2025
     
     if not debut_years:
         st.warning("Please select at least one debut season in the sidebar.")
     else:
-        with st.spinner("Querying scouting database, game logs & winger creation metrics..."):
+        # 🌟 Calculate allowed stats seasons at page level (Higher or equal than the highest debut season selected)
+        max_debut = max(debut_years)
+        allowed_stats_seasons = sorted([y for y in [2023, 2024, 2025, 2026] if y >= max_debut], reverse=True)
+        
+        # Header Area with beautiful 2-column layout (title left, stats season selectbox right)
+        col_header, col_sel = st.columns([3, 1])
+        with col_header:
+            st.markdown("## SCOUTING HUB // RECENT SIGNINGS")
+            st.markdown("Comprehensive evaluation of under-23 rookies across playtime, on-pitch impact, and territory profile.")
+        with col_sel:
+            target_playtime_season = st.selectbox(
+                "Showing stats for:",
+                options=allowed_stats_seasons,
+                index=0,
+                help="Select which season's stats to evaluate the rookies on (locked to 2026 if 2026 is selected as debut)."
+            )
+            
+        with st.spinner(""):
             players_df = get_players()
             
             def parse_seasons(val):
@@ -406,15 +606,19 @@ if app_mode == "Scouting & Rookie Hub":
             
             players_df['birth_year'] = pd.to_datetime(players_df['birth_date'], errors='coerce').dt.year
             players_df['age_at_debut'] = (players_df['min_season'] - players_df['birth_year']).astype('Int64')
-            players_df['age_in_2025'] = (2025 - players_df['birth_year']).astype('Int64')
+            players_df['age_in_target'] = (target_playtime_season - players_df['birth_year']).astype('Int64')
             
             rookies = players_df[
                 (players_df['min_season'].isin(debut_years)) & 
                 (players_df['age_at_debut'] < age_limit)
             ].copy()
             
-            # Fetch on-pitch goal differential & playtimes
-            game_goals_df = get_player_game_goals(target_playtime_season)
+            # Fetch on-pitch goal differential & playtimes only for relevant rookie IDs to avoid truncation limits
+            rookie_ids = rookies['player_id'].dropna().unique().tolist()
+            if rookie_ids:
+                game_goals_df = get_player_game_goals(target_playtime_season, player_ids=rookie_ids)
+            else:
+                game_goals_df = pd.DataFrame(columns=['player_id', 'total_minutes', 'games_played', 'goals_for', 'goals_against', 'goal_difference'])
             
             analysis_df = rookies.merge(game_goals_df, on='player_id', how='left')
             analysis_df['total_minutes'] = analysis_df['total_minutes'].fillna(0).astype(int)
@@ -439,17 +643,17 @@ if app_mode == "Scouting & Rookie Hub":
         
         # --- SUBSECTION 1: PLAYTIME & MINUTES ANALYSIS ---
         with section_tab1:
-            st.markdown("### SUBSECTION 1 // PLAYTIME & MINUTES PROFILE")
+            st.markdown(f"### SUBSECTION 1 // PLAYTIME & MINUTES PROFILE ({target_playtime_season} SEASON)")
             df_mins_sorted = analysis_df.sort_values('total_minutes', ascending=False)
             top_mins_df = df_mins_sorted.head(top_n).copy()
             
             st.dataframe(
-                top_mins_df[['player_name', 'min_season', 'age_at_debut', 'age_in_2025', 'total_minutes', 'games_played', 'primary_broad_position', 'nationality']].rename(columns={
+                top_mins_df[['player_name', 'min_season', 'age_at_debut', 'age_in_target', 'total_minutes', 'games_played', 'primary_broad_position', 'nationality']].rename(columns={
                     'player_name': 'Name',
                     'min_season': 'Debut Year',
                     'age_at_debut': 'Age Signed',
-                    'age_in_2025': '2025 Age',
-                    'total_minutes': '2025 Mins',
+                    'age_in_target': f'{target_playtime_season} Age',
+                    'total_minutes': f'{target_playtime_season} Mins',
                     'games_played': 'Games',
                     'primary_broad_position': 'Pos',
                     'nationality': 'Nation'
@@ -472,8 +676,8 @@ if app_mode == "Scouting & Rookie Hub":
                     color="primary_broad_position",
                     color_discrete_sequence=px.colors.qualitative.Set2,
                     orientation='h',
-                    labels={'total_minutes': '2025 Minutes', 'player_name': 'Player', 'primary_broad_position': 'Pos'},
-                    title=f"Top {top_n} Young Signings by 2025 Playtime (By Position)",
+                    labels={'total_minutes': f'{target_playtime_season} Minutes', 'player_name': 'Player', 'primary_broad_position': 'Pos'},
+                    title=f"Top {top_n} Young Signings by {target_playtime_season} Playtime (By Position)",
                     template="plotly_dark"
                 )
                 fig.update_layout(
@@ -489,7 +693,7 @@ if app_mode == "Scouting & Rookie Hub":
             with tab_m2:
                 top_mins_df['min_season_str'] = top_mins_df['min_season'].astype(int).astype(str)
                 top_mins_df['age_label'] = top_mins_df.apply(
-                    lambda r: f"Signed: {int(r['min_season'])} (Age {int(r['age_at_debut'])}) | 2025 Age: {int(r['age_in_2025'])}", axis=1
+                    lambda r: f"Signed: {int(r['min_season'])} (Age {int(r['age_at_debut'])}) | {target_playtime_season} Age: {int(r['age_in_target'])}", axis=1
                 )
                 
                 fig = px.bar(
@@ -497,10 +701,10 @@ if app_mode == "Scouting & Rookie Hub":
                     x="total_minutes",
                     y="player_name",
                     color="min_season_str",
-                    color_discrete_map={'2024': '#10b981', '2025': '#00e5ff'},
+                    color_discrete_map={'2023': '#a855f7', '2024': '#10b981', '2025': '#00e5ff', '2026': '#f59e0b'},
                     orientation='h',
                     text="age_label",
-                    labels={'total_minutes': '2025 Minutes', 'player_name': 'Player', 'min_season_str': 'Signing Cohort'},
+                    labels={'total_minutes': f'{target_playtime_season} Minutes', 'player_name': 'Player', 'min_season_str': 'Signing Cohort'},
                     title=f"Top {top_n} Young Signings: Cohorts & Age Details",
                     template="plotly_dark"
                 )
@@ -518,26 +722,26 @@ if app_mode == "Scouting & Rookie Hub":
             with tab_m3:
                 df_plot = analysis_df[analysis_df['total_minutes'] > 0].copy()
                 df_plot['min_season'] = df_plot['min_season'].astype(int).astype(str)
-                df_plot['age_in_2025'] = df_plot['age_in_2025'].astype(int)
+                df_plot['age_in_target'] = df_plot['age_in_target'].astype(int)
                 df_plot['age_at_debut'] = df_plot['age_at_debut'].astype(int)
                 
                 fig = px.scatter(
                     df_plot,
-                    x="age_in_2025",
+                    x="age_in_target",
                     y="total_minutes",
                     color="primary_broad_position",
                     symbol="min_season",
                     hover_name="player_name",
-                    hover_data=["age_in_2025", "total_minutes", "min_season", "age_at_debut", "nationality"],
+                    hover_data=["age_in_target", "total_minutes", "min_season", "age_at_debut", "nationality"],
                     labels={
-                        "age_in_2025": "Age in 2025",
+                        "age_in_target": f"Age in {target_playtime_season}",
                         "total_minutes": "Minutes Played",
                         "primary_broad_position": "Pos",
                         "min_season": "Signed Year",
                         "age_at_debut": "Signed Age",
                         "nationality": "Nation"
                     },
-                    title="Playtime Distribution vs Age in 2025 (Interactive)",
+                    title=f"Playtime Distribution vs Age in {target_playtime_season} (Interactive)",
                     template="plotly_dark"
                 )
                 fig.update_traces(marker=dict(size=12, line=dict(width=1, color='DarkSlateGrey')))
@@ -551,17 +755,17 @@ if app_mode == "Scouting & Rookie Hub":
 
         # --- SUBSECTION 2: ON-PITCH GOAL DIFFERENTIAL ANALYSIS ---
         with section_tab2:
-            st.markdown("### SUBSECTION 2 // ON-PITCH GOAL DIFFERENTIAL")
+            st.markdown(f"### SUBSECTION 2 // ON-PITCH GOAL DIFFERENTIAL ({target_playtime_season} SEASON)")
             df_gd_sorted = analysis_df.sort_values('goal_difference', ascending=False)
             top_gd_df = df_gd_sorted.head(top_n).copy()
             
             st.dataframe(
-                top_gd_df[['player_name', 'min_season', 'age_at_debut', 'age_in_2025', 'total_minutes', 'games_played', 'goals_for', 'goals_against', 'goal_difference', 'primary_broad_position', 'nationality']].rename(columns={
+                top_gd_df[['player_name', 'min_season', 'age_at_debut', 'age_in_target', 'total_minutes', 'games_played', 'goals_for', 'goals_against', 'goal_difference', 'primary_broad_position', 'nationality']].rename(columns={
                     'player_name': 'Name',
                     'min_season': 'Debut Year',
                     'age_at_debut': 'Age Signed',
-                    'age_in_2025': '2025 Age',
-                    'total_minutes': '2025 Mins',
+                    'age_in_target': f'{target_playtime_season} Age',
+                    'total_minutes': f'{target_playtime_season} Mins',
                     'games_played': 'Games',
                     'goals_for': 'Goals For (GF)',
                     'goals_against': 'Goals Against (GA)',
@@ -589,8 +793,8 @@ if app_mode == "Scouting & Rookie Hub":
                     color_discrete_map={'Positive (+)': '#10b981', 'Negative (-)': '#ef4444'},
                     orientation='h',
                     text="goal_difference",
-                    labels={'goal_difference': 'Net On-Pitch Goal Difference (+/-)', 'player_name': 'Player Name', 'gd_color': 'Status'},
-                    title=f"Top {top_n} Young Signings: Net On-Pitch Goal Differential in 2025",
+                    labels={'goal_difference': f'Net On-Pitch Goal Difference (+/-) in {target_playtime_season}', 'player_name': 'Player Name', 'gd_color': 'Status'},
+                    title=f"Top {top_n} Young Signings: Net On-Pitch Goal Differential in {target_playtime_season}",
                     template="plotly_dark"
                 )
                 fig.update_traces(textposition="outside")
@@ -615,14 +819,14 @@ if app_mode == "Scouting & Rookie Hub":
                     color="primary_broad_position",
                     symbol="min_season_str",
                     hover_name="player_name",
-                    hover_data=["age_in_2025", "total_minutes", "goals_for", "goals_against", "goal_difference", "nationality"],
+                    hover_data=["age_in_target", "total_minutes", "goals_for", "goals_against", "goal_difference", "nationality"],
                     labels={
                         "goals_for": "Goals Scored FOR Team While On Pitch (GF)",
                         "goals_against": "Goals Conceded AGAINST Team While On Pitch (GA)",
                         "primary_broad_position": "Pos",
                         "min_season_str": "Signed Year"
                     },
-                    title="On-Pitch Goals For vs. Goals Against (Diagonal Line = Parity)",
+                    title=f"On-Pitch Goals For vs. Goals Against in {target_playtime_season} (Diagonal Line = Parity)",
                     template="plotly_dark"
                 )
                 max_val = max(df_scatter['goals_for'].max(), df_scatter['goals_against'].max()) + 5
@@ -639,8 +843,8 @@ if app_mode == "Scouting & Rookie Hub":
 
         # --- SUBSECTION 3: ATTACKING CREATION & WINGER PROFILING ---
         with section_tab3:
-            st.markdown("### SUBSECTION 3 // ATTACKING CREATION & WINGER PROFILING")
-            st.markdown("Evaluates U23 wingers across **Attacking Third Pass Volume**, **Full 3-Third Territory Distribution**, and **Estimated Attacking 3rd Key Passes**.")
+            st.markdown(f"### SUBSECTION 3 // ATTACKING CREATION & WINGER PROFILING ({target_playtime_season} SEASON)")
+            st.markdown(f"Evaluates U23 wingers across **Attacking Third Pass Volume**, **Full 3-Third Territory Distribution**, and **Estimated Attacking 3rd Key Passes** during the {target_playtime_season} season.")
             
             winger_sorted = winger_analysis_df.sort_values('est_att_key_passes', ascending=False)
             top_winger_df = winger_sorted.head(top_n).copy()
@@ -648,7 +852,7 @@ if app_mode == "Scouting & Rookie Hub":
             # Solution 3: Transparent Data Table (With Def, Mid, Att % breakdown)
             st.dataframe(
                 top_winger_df[[
-                    'player_name', 'min_season', 'age_at_debut', 'age_in_2025', 'minutes_played', 
+                    'player_name', 'min_season', 'age_at_debut', 'age_in_target', 'minutes_played', 
                     'total_passes_all_thirds', 'def_passes', 'mid_passes', 'att_third_passes', 
                     'def_share_pct', 'mid_share_pct', 'att_third_share_pct', 
                     'key_passes', 'est_att_key_passes', 'primary_assists', 'est_att_assists', 'xassists', 'nationality'
@@ -656,7 +860,7 @@ if app_mode == "Scouting & Rookie Hub":
                     'player_name': 'Name',
                     'min_season': 'Debut Year',
                     'age_at_debut': 'Age Signed',
-                    'age_in_2025': '2025 Age',
+                    'age_in_target': f'{target_playtime_season} Age',
                     'minutes_played': 'Mins',
                     'total_passes_all_thirds': 'Total Passes',
                     'def_passes': 'Def 3rd Passes',
@@ -707,7 +911,7 @@ if app_mode == "Scouting & Rookie Hub":
                     orientation='h',
                     hover_data=["Passes"],
                     labels={'Percentage': 'Pass Territory Share (%)', 'Player': 'Player Name', 'Third': 'Field Zone'},
-                    title="Winger Territory Profile: Full 3-Third Pass Distribution (%) (Sorted by Attacking 3rd Share %)",
+                    title=f"Winger Territory Profile: Full 3-Third Pass Distribution (%) in {target_playtime_season} (Sorted by Attacking 3rd Share %)",
                     template="plotly_dark"
                 )
                 fig.update_layout(
@@ -734,7 +938,7 @@ if app_mode == "Scouting & Rookie Hub":
                         'est_att_key_passes': 'Estimated Count of Key Passes from Attacking 3rd', 
                         'player_name': 'Player Name'
                     },
-                    title=f"Top U23 Wingers by Estimated Key Passes from Attacking 3rd (Ranked Highest to Lowest)",
+                    title=f"Top U23 Wingers by Estimated Key Passes from Attacking 3rd in {target_playtime_season} (Ranked Highest to Lowest)",
                     template="plotly_dark"
                 )
                 fig.update_traces(textposition="outside", texttemplate="%{text:.1f}")
@@ -756,14 +960,14 @@ if app_mode == "Scouting & Rookie Hub":
                     color="primary_assists",
                     color_continuous_scale="Viridis",
                     hover_name="player_name",
-                    hover_data=["age_in_2025", "minutes_played", "att_third_passes", "key_passes", "est_att_key_passes", "primary_assists", "xassists"],
+                    hover_data=["age_in_target", "minutes_played", "att_third_passes", "key_passes", "est_att_key_passes", "primary_assists", "xassists"],
                     labels={
                         "att_third_share_pct": "Attacking 3rd Pass Share (%)",
                         "est_att_key_passes": "Estimated Attacking 3rd Key Passes",
                         "primary_assists": "Direct Assists",
                         "xassists": "Expected Assists (xA)"
                     },
-                    title="Winger Profiling: Attacking 3rd Share % vs. Estimated Attacking 3rd Key Passes",
+                    title=f"Winger Profiling: Attacking 3rd Share % vs. Estimated Attacking 3rd Key Passes in {target_playtime_season}",
                     template="plotly_dark"
                 )
                 fig.update_traces(marker=dict(line=dict(width=1, color='White')))
@@ -775,16 +979,18 @@ if app_mode == "Scouting & Rookie Hub":
                 )
                 st.plotly_chart(fig, width="stretch", config={'displayModeBar': True, 'displaylogo': False})
 
-# --- Dashboard 2: MLS Moneyball Optimizer ---
+# --- Dashboard 2: Moneyball Roster Planner ---
 elif app_mode == "Moneyball Roster Planner":
     st.markdown("## TACTICAL PLANNER // MONEYBALL OPTIMIZER")
     st.markdown("Construct an optimal cap-compliant XI maximizing **Goals Added (g+)**.")
     
+    # Sidebar controls
     st.sidebar.markdown("---")
     st.sidebar.markdown("<h3 style='color:#10b981;'>ROSTER CONSTRAINTS</h3>", unsafe_allow_html=True)
-    opt_season = st.sidebar.selectbox("Target Season:", [2024, 2023], index=0)
+    opt_season = st.sidebar.selectbox("Target Season:", [2026, 2025, 2024, 2023], index=0)
     budget = st.sidebar.slider("Salary Cap Budget ($ USD):", 1_000_000, 15_000_000, 5_000_000, step=250_000)
     formation_name = st.sidebar.selectbox("Tactical Formation:", ["4-3-3", "4-4-2", "3-5-2", "5-3-2"], index=0)
+    min_mins = st.sidebar.slider("Minimum Minutes Played:", 100, 1500, 450, step=50)
     
     formation_mapping = {
         "4-3-3": {"GK": 1, "DF": 4, "MF": 3, "FW": 3},
@@ -794,12 +1000,14 @@ elif app_mode == "Moneyball Roster Planner":
     }
     formation = formation_mapping[formation_name]
     
+    # Load and process data
     with st.spinner("Analyzing player database..."):
         players_df = get_players()
         salaries_df = get_player_salaries(opt_season)
         outfield_gplus = get_outfield_gplus(opt_season)
         gk_gplus = get_gk_gplus(opt_season)
         
+        # Process salaries
         clean_salaries = salaries_df.sort_values("mlspa_release").groupby("player_id").last().reset_index()
         clean_players = players_df.drop_duplicates(subset=["player_id"])
         
@@ -813,8 +1021,9 @@ elif app_mode == "Moneyball Roster Planner":
         merged = merged.merge(clean_salaries[["player_id", "base_salary", "guaranteed_compensation"]], on="player_id", how="inner")
         
         df_clean = merged.dropna(subset=["primary_broad_position", "guaranteed_compensation", "total_gplus"])
-        df_clean = df_clean[df_clean['minutes_played'] >= 450].copy()
+        df_clean = df_clean[df_clean['minutes_played'] >= min_mins].copy()
         
+    # Solve PuLP ILP
     prob = pulp.LpProblem("MLS_Moneyball_XI", pulp.LpMaximize)
     indices = df_clean.index.tolist()
     x = pulp.LpVariable.dicts("player", indices, cat="Binary")
@@ -832,6 +1041,7 @@ elif app_mode == "Moneyball Roster Planner":
         selected_indices = [i for i in indices if x[i].varValue == 1]
         squad = df_clean.loc[selected_indices].copy()
         
+        # Metrics Display (FM24 Cards with White Text)
         total_cost = squad['guaranteed_compensation'].sum()
         total_gplus = squad['total_gplus'].sum()
         avg_cost = total_cost / 11
@@ -870,6 +1080,7 @@ elif app_mode == "Moneyball Roster Planner":
         </div>
         """, unsafe_allow_html=True)
         
+        # Two Column Layout: Tactical Pitch on Left, Data Table / Scatter on Right
         col_pitch, col_details = st.columns([1.1, 1])
         
         with col_pitch:
@@ -892,6 +1103,7 @@ elif app_mode == "Moneyball Roster Planner":
                 hide_index=True
             )
             
+            # FM24 Dark Theme Scatter Plot (With styled ModeBar options)
             st.markdown("### ANALYSIS // VALUE MATRIX")
             df_clean['is_selected'] = df_clean.index.isin(selected_indices)
             df_clean['selected_label'] = df_clean['is_selected'].map({True: 'Starting XI', False: 'Other MLS Players'})
@@ -921,3 +1133,141 @@ elif app_mode == "Moneyball Roster Planner":
                 title_font_color='#10b981'
             )
             st.plotly_chart(fig, width="stretch", config={'displayModeBar': True, 'displaylogo': False})
+    else:
+        st.error("No optimal solution could be found. Try raising the budget or changing the formation.")
+
+# --- Dashboard 3: Player Profile Search ---
+elif app_mode == "Player Profile Search":
+    st.markdown("## PLAYER PROFILE SEARCH")
+    st.markdown("Query spatial profiling, bio details, and salary records for any player in MLS.")
+    
+    with st.spinner(""):
+        profile_db = get_player_profile_database()
+        
+    all_names = sorted(profile_db['player_name'].dropna().unique())
+    
+    # 🔎 Autocomplete Search box: Starts empty, shows list as you type, select to choose (Google style)
+    selected_name = st.selectbox(
+        "Search Player by Name:",
+        options=all_names,
+        index=None,
+        placeholder="Type to search (e.g. Messi, Segovia, Minoungou...)"
+    )
+    
+    if selected_name:
+        p_record = profile_db[profile_db['player_name'] == selected_name].iloc[0]
+        
+        # Format strings safely
+        team = p_record['team_name'] if pd.notna(p_record['team_name']) else "Unassigned / Free Agent"
+        nationality = p_record['nationality'] if pd.notna(p_record['nationality']) else "N/A"
+        age = f"{int(p_record['age_2026'])}" if pd.notna(p_record['age_2026']) else "N/A"
+        pos = p_record['position'] if pd.notna(p_record['position']) else (p_record['primary_broad_position'] if pd.notna(p_record['primary_broad_position']) else "N/A")
+        
+        gcomp = p_record['guaranteed_compensation']
+        bsal = p_record['base_salary']
+        
+        # Fetch playtime & on-pitch stats dynamically for this single player ID for the ongoing 2026 season!
+        with st.spinner(""):
+            player_stats_df = get_player_game_goals(2026, player_ids=[p_record['player_id']])
+            
+        if not player_stats_df.empty:
+            stat_row = player_stats_df.iloc[0]
+            mins = int(stat_row['total_minutes'])
+            games = int(stat_row['games_played'])
+            goals_for = int(stat_row['goals_for'])
+            goals_against = int(stat_row['goals_against'])
+            net_gd = int(stat_row['goal_difference'])
+        else:
+            mins = 0
+            games = 0
+            goals_for = 0
+            goals_against = 0
+            net_gd = 0
+            
+        # Resolve Team Logo URL & Country Flag URL
+        logo_id = espn_logo_map.get(p_record['team_abbreviation'], "")
+        logo_html = f'<img src="https://a.espncdn.com/combiner/i?img=/i/teamlogos/soccer/500/{logo_id}.png&w=120&h=120" style="height: 64px; width: 64px; margin-right: 20px; border-radius: 4px; vertical-align: middle;">' if logo_id else ""
+        
+        flag_code = flag_country_map.get(p_record['nationality'], "").lower()
+        flag_html = f'<img src="https://flagcdn.com/w40/{flag_code}.png" style="height: 18px; width: auto; margin-left: 8px; border: 1px solid rgba(255,255,255,0.25); border-radius: 2px; vertical-align: middle; display: inline-block;" alt="{nationality} flag">' if flag_code else ""
+        
+        # Formulate html header as a single line with absolutely no newlines to bypass any Streamlit markdown parser quirks
+        header_html = f'<div style="display: flex; align-items: center; border-bottom: 2px solid #10b981; padding-bottom: 15px; margin-top: 25px; margin-bottom: 20px;">{logo_html}<div><h2 style="margin: 0; color: #ffffff !important; font-size: 2.4rem; display: inline-block; vertical-align: middle;">{selected_name.upper()}</h2><div style="margin-top: 5px; display: flex; align-items: center; gap: 10px;"><span class="fm-badge-cyan">{team.upper()}</span><span class="fm-badge-green" style="display: inline-flex; align-items: center;">{nationality.upper()} {flag_html}</span></div></div></div>'
+        
+        st.markdown(header_html, unsafe_allow_html=True)
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.markdown(f"""
+            <div class="fm-card" style="height: 180px;">
+                <span class="fm-badge-green">BIOGRAPHICAL DETAILS</span>
+                <div style="margin-top: 15px; font-size: 1.1rem; line-height: 1.8;">
+                    <b>Age (as of 2026):</b> {age}<br>
+                    <b>Nationality:</b> {nationality}<br>
+                    <b>Birth Date:</b> {p_record['birth_date_parsed'].strftime('%B %d, %Y') if pd.notna(p_record['birth_date_parsed']) else 'N/A'}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown(f"""
+            <div class="fm-card" style="height: 180px;">
+                <span class="fm-badge-cyan">TACTICAL PROFILE</span>
+                <div style="margin-top: 15px; font-size: 1.1rem; line-height: 1.8;">
+                    <b>Primary Position:</b> {pos}<br>
+                    <b>Broad Category:</b> {p_record['primary_broad_position'] if pd.notna(p_record['primary_broad_position']) else 'N/A'}<br>
+                    <b>General Position:</b> {p_record['primary_general_position'] if pd.notna(p_record['primary_general_position']) else 'N/A'}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        with col3:
+            st.markdown(f"""
+            <div class="fm-card" style="height: 180px;">
+                <span class="fm-badge-green">FINANCIAL CONTRACT (2025/2026)</span>
+                <div style="margin-top: 15px; font-size: 1.1rem; line-height: 1.8;">
+                    <b>Guaranteed Compensation:</b> ${gcomp:,.2f}<br>
+                    <b>Base Salary:</b> ${bsal:,.2f}<br>
+                    <b>MLSPA Listed Position:</b> {p_record['position'] if pd.notna(p_record['position']) else 'N/A'}
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+        st.markdown("### 2026 PLAYTIME & ON-PITCH IMPACT SUMMARY (ONGOING SEASON)")
+        
+        scol1, scol2, scol3, scol4 = st.columns(4)
+        
+        scol1.markdown(f"""
+        <div class="fm-card">
+            <span class="fm-badge-green">MINUTES PLAYED</span>
+            <h2 style="margin: 10px 0 0 0; color: #ffffff !important;">{mins:,}</h2>
+            <span style="color:#ffffff; font-size:0.9rem;">Total play duration (2026)</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        scol2.markdown(f"""
+        <div class="fm-card">
+            <span class="fm-badge-cyan">GAMES PLAYED</span>
+            <h2 style="margin: 10px 0 0 0; color: #ffffff !important;">{games}</h2>
+            <span style="color:#ffffff; font-size:0.9rem;">Total match appearances</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        scol3.markdown(f"""
+        <div class="fm-card">
+            <span class="fm-badge-green">ON-PITCH GOALS</span>
+            <h2 style="margin: 10px 0 0 0; color: #ffffff !important;">{goals_for}:{goals_against}</h2>
+            <span style="color:#ffffff; font-size:0.9rem;">Goals For vs. Against (GF:GA)</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        scol4.markdown(f"""
+        <div class="fm-card">
+            <span class="fm-badge-cyan">NET GOAL IMPACT (+/-)</span>
+            <h2 style="margin: 10px 0 0 0; color: {'#10b981' if net_gd >= 0 else '#ef4444'} !important;">{net_gd:+}</h2>
+            <span style="color:#ffffff; font-size:0.9rem;">Goal differential while on field</span>
+        </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.info("💡 Type a player name in the search box above to load their tactical profile.")
